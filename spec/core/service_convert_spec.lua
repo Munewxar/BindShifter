@@ -1,0 +1,43 @@
+local Env = require("env")
+
+describe("Service: conversion (US6)", function()
+	local env, s
+	before_each(function()
+		env = Env.new({ bt4 = true, bindings = { Q = "CLICK BT4Button25:LeftButton", E = "CLICK BT4Button13:LeftButton" } })
+		s = env.service
+		s:saveCurrent("Main")
+	end)
+
+	it("creates a new profile with the default name", function()
+		local step = s:convert("Main", "blizzard")
+		assert.equal("done", step.step)
+		assert.equal("Main (mode_blizzard)", step.name)
+		assert.equal("convert", step.report.kind)
+		local p = s:getProfile(step.name)
+		assert.equal("blizzard", p.mode)
+		assert.equal("MULTIACTIONBAR3BUTTON1", p.bindings.Q)
+		assert.equal("CLICK BT4Button13:LeftButton", p.inactive.E)
+		assert.equal("bt4", s:getProfile("Main").mode)
+		assert.equal("convert", s:listHistory()[1].op)
+	end)
+
+	it("asks before overwriting and refuses the same mode", function()
+		s:convert("Main", "blizzard", "Blz")
+		assert.equal("confirmOverwrite", s:convert("Main", "blizzard", "Blz").step)
+		assert.equal("done", s:convert("Main", "blizzard", "Blz", true).step)
+		assert.equal("errSameMode", s:convert("Main", "bt4").err)
+	end)
+
+	it("keeps the default name within 50 characters", function()
+		s:saveCurrent(string.rep("x", 50))
+		local step = s:convert(string.rep("x", 50), "blizzard")
+		assert.equal("done", step.step)
+		assert.is_true(env.ns.Util.utf8len(step.name) <= 50)
+	end)
+
+	it("undoes a conversion", function()
+		local step = s:convert("Main", "blizzard")
+		s:undo()
+		assert.is_nil(s:getProfile(step.name))
+	end)
+end)

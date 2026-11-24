@@ -1,0 +1,43 @@
+## Interface: 30300
+## Title: BindShifter
+## Notes: Keybinding profiles with Bartender4 / Blizzard action bar mode switching
+## Notes-ruRU: Профили биндов с переключением режимов Bartender4 / стандартные панели
+## Version: 0.1.0
+## Author: Munewxar
+## SavedVariables: BindShifterDB
+## OptionalDeps: Bartender4
+
+embeds.xml
+
+Locales\enUS.lua
+Locales\ruRU.lua
+
+Core\Locale.lua
+Core\Util.lua
+Core\Keys.lua
+Core\SlotMap.lua
+Core\Commands.lua
+Core\Groups.lua
+Core\Snapshot.lua
+Core\Diff.lua
+Core\Validate.lua
+Core\Apply.lua
+Core\Store.lua
+Core\History.lua
+Core\Convert.lua
+Core\Codec.lua
+Core\Queue.lua
+Core\Mode.lua
+Core\Migrations.lua
+Core\Service.lua
+
+Platform\WowApi.lua
+
+UI\Chat.lua
+UI\Format.lua
+UI\Popups.lua
+UI\Windows.lua
+UI\Options.lua
+UI\Slash.lua
+
+Platform\Addon.lua
