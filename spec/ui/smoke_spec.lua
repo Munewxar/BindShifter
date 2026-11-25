@@ -140,8 +140,12 @@ describe("UI smoke", function()
 		assert.is_not_nil(ns.ui.service:getProfile("Main"))
 
 		opt("profiles", "profile").set(nil, "main")
-		opt("profiles", "bt4Select").set(nil, "Raid")
-		assert.equal("Raid", ns.ui.service:getProfile("Main").bt4Profile)
+		-- The list shows bare names; mode and Bartender4 profile are read-only text in the card.
+		assert.equal("Main", opt("profiles", "profile").values().main)
+		local card = opt("profiles", "card").name()
+		assert.is_truthy(card:find(L.cardMode:format(L.mode_bt4), 1, true))
+		assert.is_truthy(card:find(L.cardBT4Profile:format("Default"), 1, true))
+		assert.is_nil(opt("profiles", "mode"))
 
 		opt("profiles", "duplicate").func()
 		env.acceptPopup("Copy")

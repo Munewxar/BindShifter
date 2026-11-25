@@ -145,8 +145,7 @@ local function buildOptions()
 						values = function()
 							local values = {}
 							for _, p in ipairs(service:listProfiles()) do
-								values[p.key] = ("%s%s - %s - %s"):format(p.active and "* " or "", p.name,
-									Format.mode(L, p.mode), Format.date(p.updatedAt))
+								values[p.key] = p.name
 							end
 							return values
 						end,
@@ -159,76 +158,30 @@ local function buildOptions()
 						end,
 						disabled = noProfile,
 					},
+					-- Mode and Bartender4 profile are read-only facts recorded at save time.
+					-- To move a profile to the other mode, use "Convert".
 					card = {
 						type = "description",
 						order = 12,
+						fontSize = "medium",
 						name = function()
 							local p = selectedProfile()
 							if not p then
 								return L.noProfiles
 							end
-							return L.profileCard:format(ns.Util.count(p.bindings), ns.Util.count(p.inactive),
-								Format.date(p.createdAt), Format.date(p.updatedAt))
-						end,
-					},
-					mode = {
-						type = "select",
-						order = 13,
-						name = L.profileMode,
-						values = function()
-							return { bt4 = L.mode_bt4, blizzard = L.mode_blizzard }
-						end,
-						get = function()
-							local p = selectedProfile()
-							return p and p.mode or nil
-						end,
-						set = function(_, value)
-							handle(service:setProfileMode(selected, value))
-						end,
-						disabled = noProfile,
-					},
-					bt4Select = {
-						type = "select",
-						order = 14,
-						name = L.profileBT4,
-						values = function()
-							local values = { [""] = L.none }
-							for _, name in ipairs(service.api.bt4Profiles() or {}) do
-								values[name] = name
+							local lines = { L.cardMode:format(Format.mode(L, p.mode)) }
+							if p.mode == "bt4" and p.bt4Profile then
+								lines[#lines + 1] = L.cardBT4Profile:format(p.bt4Profile)
 							end
-							local p = selectedProfile()
-							if p and p.bt4Profile then
-								values[p.bt4Profile] = p.bt4Profile
+							local inactive = ns.Util.count(p.inactive)
+							if inactive > 0 then
+								lines[#lines + 1] = L.cardCountsInactive:format(ns.Util.count(p.bindings), inactive)
+							else
+								lines[#lines + 1] = L.cardCounts:format(ns.Util.count(p.bindings))
 							end
-							return values
+							lines[#lines + 1] = L.cardDates:format(Format.date(p.createdAt), Format.date(p.updatedAt))
+							return table.concat(lines, "\n")
 						end,
-						get = function()
-							local p = selectedProfile()
-							return p and (p.bt4Profile or "") or nil
-						end,
-						set = function(_, value)
-							handle(service:setProfileBT4(selected, value))
-						end,
-						hidden = function()
-							return not status().bt4Loaded
-						end,
-						disabled = noProfile,
-					},
-					bt4Input = {
-						type = "input",
-						order = 14,
-						name = L.profileBT4,
-						get = function()
-							local p = selectedProfile()
-							return p and p.bt4Profile or ""
-						end,
-						set = function(_, value)
-							handle(service:setProfileBT4(selected, ns.Util.trim(value)))
-						end,
-						hidden = function()
-							return status().bt4Loaded
-						end,
-						disabled = noProfile,
 					},
 					apply = {
 						type = "execute",

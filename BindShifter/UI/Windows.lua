@@ -169,14 +169,12 @@ function Windows.showPreview(step, readOnly)
 	addScrollText(f, table.concat(lines, "\n"), 330)
 
 	if readOnly then
-		addButton(f, L.btnClose, function() f:Hide() end)
-		return
+		return -- the window has its own Close button
 	end
 	addButton(f, L.btnApply, function()
 		f:Hide()
 		Windows.handle(service:confirmApply(step))
 	end)
-	addButton(f, L.btnCancel, function() f:Hide() end)
 end
 
 -- Mode choice (FR-035, FR-038).
@@ -213,7 +211,6 @@ function Windows.showModeChoice(step)
 			Windows.handle(service:convert(step.name))
 		end, 240)
 	end
-	addButton(f, L.btnCancel, function() f:Hide() end, 240)
 end
 
 -- Report (FR-013, FR-016, FR-043).
@@ -222,7 +219,6 @@ function Windows.showReport(report, name)
 	local f = newWindow("report", L.reportTitle:format(name or ""), 560, 400)
 	f:SetStatusText(L.reportSummary:format(report.changed or 0, #report.issues))
 	addScrollText(f, table.concat(issueLines(L, report.issues), "\n"), 280)
-	addButton(f, L.btnClose, function() f:Hide() end)
 end
 
 function Windows.showExport(step)
@@ -235,7 +231,6 @@ function Windows.showExport(step)
 		box.editBox:SetFocus()
 		box.editBox:HighlightText()
 	end
-	addButton(f, L.btnClose, function() f:Hide() end)
 end
 
 function Windows.showImport()
@@ -290,7 +285,6 @@ function Windows.showImport()
 			Windows.handle(service:confirmImport(request, { replace = true }))
 		end
 	end, 160, true)
-	addButton(f, L.btnCancel, function() f:Hide() end)
 end
 
 -- Renders any Service step.
